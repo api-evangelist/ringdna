@@ -1,0 +1,69 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "RingDNA",
+  "alternateName": "Revenue.io",
+  "description": "RingDNA (now Revenue.io) is an intelligent revenue platform providing REST APIs for sales dialing, call recording, conversation analytics, real-time coaching, and CRM integration. The platform is 100% Salesforce-native and serves revenue teams with AI-driven sales engagement, guided selling cadences, conversation intelligence, and revenue orchestration capabilities.",
+  "url": "https://www.revenue.io",
+  "sameAs": [
+    "https://github.com/ringdna",
+    "https://www.linkedin.com/company/revenueio",
+    "https://twitter.com/revenue_io"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer support",
+    "url": "https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "RingDNA API Products",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "name": "RingDNA Guided Selling API",
+        "description": "REST API endpoints for managing Guided Selling participant actions within Revenue.io sales engagement workflows, including completing and skipping participant steps in sales cadences.",
+        "url": "https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna",
+        "category": "API"
+      }
+    ]
+  },
+  "keywords": [
+    "Sales Engagement",
+    "Conversation Intelligence",
+    "Sales Dialing",
+    "Call Recording",
+    "Revenue Orchestration",
+    "CRM Integration",
+    "Salesforce",
+    "AI Coaching",
+    "Sales Automation",
+    "Guided Selling"
+  ],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "url": "https://www.revenue.io"
+  },
+  "subjectOf": [
+    {
+      "@type": "WebPage",
+      "name": "RingDNA Documentation",
+      "url": "https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna"
+    },
+    {
+      "@type": "WebPage",
+      "name": "Revenue.io Blog",
+      "url": "https://www.revenue.io/blog"
+    },
+    {
+      "@type": "WebPage",
+      "name": "Revenue.io Pricing",
+      "url": "https://www.revenue.io/pricing"
+    },
+    {
+      "@type": "WebPage",
+      "name": "Revenue.io Status Page",
+      "url": "https://status.revenue.io"
+    }
+  ]
+}
