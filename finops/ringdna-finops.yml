@@ -1,0 +1,24 @@
+name: RingDNA FinOps
+description: Financial operations guidance for Revenue.io (formerly RingDNA) deployments. Pricing is custom and per-user with annual contracts typical. Cost optimization focuses on right-sizing seat counts across the three plan tiers and aligning feature access to role needs.
+url: https://www.revenue.io/pricing
+model: per-user-annual
+currency: USD
+billing:
+  - model: Per-user monthly (billed annually)
+  - contracts: Custom enterprise agreements typical
+  - minimum: 15 seats recommended for full platform impact
+  - median-contract: ~$59,460/year (market estimate, varies by tier and seat count)
+cost-optimization:
+  - Right-size plan tier per rep role (Activate for inbound-only, Engage for sequencing, Orchestrate for full AI)
+  - Audit seat utilization quarterly; remove inactive users promptly
+  - Confirm Salesforce license costs are accounted for separately (required for all tiers)
+  - Negotiate multi-year agreements for volume discounts
+  - Evaluate add-on telephony costs (local presence, toll-free minutes) separately
+  - Review CallerDNA call tracking phone number inventory to avoid unused number charges
+compliance:
+  - HIPAA
+  - GDPR
+  - CCPA
+  - CPRA
+  - SOC 2 Type II
+  - TCPA

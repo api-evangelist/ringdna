@@ -1,0 +1,57 @@
+aid: ringdna
+name: RingDNA
+description: RingDNA (now Revenue.io) is an intelligent revenue platform providing REST APIs for sales dialing, call recording, conversation analytics, real-time coaching, and CRM integration. The platform is 100% Salesforce-native and serves revenue teams with AI-driven sales engagement, guided selling cadences, conversation intelligence, and revenue orchestration capabilities including the RingDNA Dialer, Moments real-time guidance, and Guided Selling API endpoints.
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+url: https://raw.githubusercontent.com/api-evangelist/ringdna/refs/heads/main/apis.yml
+created: '2026-06-13'
+modified: '2026-06-13'
+specificationVersion: '0.19'
+tags:
+  - Sales Engagement
+  - Conversation Intelligence
+  - Sales Dialing
+  - Call Recording
+  - Revenue Orchestration
+  - CRM Integration
+  - Salesforce
+  - AI Coaching
+  - Sales Automation
+apis:
+  - aid: ringdna:guided-selling-api
+    name: RingDNA Guided Selling API
+    description: REST API endpoints for managing Guided Selling participant actions within Revenue.io sales engagement workflows, including completing and skipping participant steps in sales cadences.
+    humanURL: https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna
+    baseURL: https://api.ringdna.com
+    tags:
+      - Guided Selling
+      - Sales Cadences
+      - Sales Automation
+    properties:
+      - type: Documentation
+        url: https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna
+common:
+  - type: Website
+    url: https://www.revenue.io
+  - type: Documentation
+    url: https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna
+  - type: GitHubOrg
+    url: https://github.com/ringdna
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/revenueio
+  - type: Blog
+    url: https://www.revenue.io/blog
+  - type: Pricing
+    url: https://www.revenue.io/pricing
+  - type: StatusPage
+    url: https://status.revenue.io
+  - type: X
+    url: https://twitter.com/revenue_io
+  - type: Plans
+    url: plans/ringdna-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/ringdna-rate-limits.yml
+  - type: FinOps
+    url: finops/ringdna-finops.yml
+maintainers:
+  - FN: Kin Lane
+    email: kin@apievangelist.com

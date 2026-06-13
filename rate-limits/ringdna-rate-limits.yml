@@ -1,0 +1,9 @@
+name: RingDNA Rate Limits
+description: Revenue.io (formerly RingDNA) does not publish explicit public API rate limit documentation. Rate limits are enforced at the platform level and may vary by plan and integration. As a Salesforce-native platform, API usage is also subject to Salesforce API governor limits. Contact Revenue.io support for specific rate limit guidance applicable to your deployment.
+url: https://support.revenue.io
+notes:
+  - Revenue.io is 100% Salesforce-native; all data flows through Salesforce APIs
+  - Salesforce API call limits apply to all Revenue.io integrations
+  - Platform-level throttling is managed internally; contact support for details
+  - Guided Selling API endpoints (Complete/Skip Participant Action) may have per-org limits
+  - No publicly documented rate limit tiers as of 2026-06-13

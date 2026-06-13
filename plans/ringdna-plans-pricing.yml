@@ -1,0 +1,61 @@
+name: RingDNA Plans and Pricing
+description: Revenue.io (formerly RingDNA) offers three tiered plans licensed on a per-user basis. All plans require Salesforce and are priced on a custom quote basis. Contact sales for current per-seat pricing.
+url: https://www.revenue.io/pricing
+plans:
+
+  - name: Activate
+    description: Power every rep with the #1 Salesforce dialer, real-time call coaching, and instant lead response. Best for teams focused on inbound response, call performance, and rep productivity.
+    pricing:
+      model: per-user
+      period: monthly
+      amount: custom
+      currency: USD
+    features:
+      - Salesforce-native RingDNA Dialer
+      - Moments real-time AI call guidance
+      - CallerDNA call tracking and attribution
+      - Hot Leads speed-to-lead routing
+      - Call recording and campaign tracking
+      - Local Presence dialing
+      - SMS/MMS and IVR messaging
+      - Voicemail drop
+      - Omni-channel basics
+
+  - name: Engage
+    description: Equip your team with guided cadences, AI-prioritized follow-up, and consistent sales workflows. Best for teams needing structured cadences and pipeline acceleration.
+    pricing:
+      model: per-user
+      period: monthly
+      amount: custom
+      currency: USD
+    features:
+      - Everything in Activate
+      - Guided Selling cadences
+      - Dynamic Lead Prioritization
+      - Quick Actions for instant follow-ups
+      - Email sequencing
+      - SMS sequencing
+      - Opportunity playbooks
+      - Deal re-engagement sequences
+      - Outcome attribution
+      - Multichannel outreach (call, email, SMS)
+
+  - name: Orchestrate
+    description: Automate coaching, insights, and execution with AI-driven revenue orchestration. Best for teams requiring unified AI workflows and higher win rates.
+    pricing:
+      model: per-user
+      period: monthly
+      amount: custom
+      currency: USD
+    features:
+      - Everything in Engage
+      - Ask Revenue (AI deal/call/account queries)
+      - Deal Scoring and Pipeline Risk Insights
+      - AI call summaries and deal summaries
+      - AI Coaching Feedback and Scorecards
+      - Revenue Intelligence Dashboard
+      - Forecast Analyzer
+      - Agentic AI for custom agents
+      - Full Conversation Intelligence suite
+      - Salesforce-certified implementation
+      - Dedicated success manager
