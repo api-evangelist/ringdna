@@ -1,75 +1,18 @@
 {
-  "url": "https://www.revenue.io/blog",
-  "retrieved": "2026-06-13",
-  "posts": [
-    {
-      "title": "The 6 Best Siro Alternatives and Competitors in 2026",
-      "url": "https://www.revenue.io/blog/siro-alternatives-and-competitors",
-      "date": "2026-06-01",
-      "description": "Compares leading AI sales coaching platforms for field sales coaching and conversation intelligence capabilities."
-    },
-    {
-      "title": "How to Automate Salesforce Data Capture With AI Conversation Agents",
-      "url": "https://www.revenue.io/blog/automate-salesforce-data-capture-with-conversation-agents",
-      "date": "2026-06-01",
-      "description": "Explores using AI agents to extract insights from call transcripts and automatically update CRM records."
-    },
-    {
-      "title": "The 6 Best Balto Alternatives and Competitors 2026",
-      "url": "https://www.revenue.io/blog/best-balto-alternatives-and-competitors",
-      "date": "2026-06-01",
-      "description": "Reviews conversation intelligence and call coaching platforms emphasizing real-time guidance capabilities."
-    },
-    {
-      "title": "Salesforce Data Hygiene Tools and Best Practices",
-      "url": "https://www.revenue.io/blog/salesforce-data-hygiene-tools-and-best-practices",
-      "date": "2026-05-28",
-      "description": "Addresses maintaining accurate, complete CRM records for reliable forecasting and decision-making."
-    },
-    {
-      "title": "Automatic Activity Capture vs Manual CRM Data Entry",
-      "url": "https://www.revenue.io/blog/automatic-activity-capture-vs-manual-crm",
-      "date": "2026-05-28",
-      "description": "Contrasts automated interaction logging with manual rep-based data entry methods and their impact on CRM reliability."
-    },
-    {
-      "title": "Multichannel Sales Cadence Template: 14-Day Outbound Sequence",
-      "url": "https://www.revenue.io/blog/multichannel-sales-cadence-template-14-day-outbound-sequence",
-      "date": "2026-05-22",
-      "description": "Provides a structured multi-touch outbound approach across email, phone, SMS, and social channels."
-    },
-    {
-      "title": "All-in-One Revenue Platform vs. Point Solutions: Which Is Right for You?",
-      "url": "https://www.revenue.io/blog/all-in-one-revenue-platform-vs-point-solutions-which-is-right-for-you",
-      "date": "2026-05-22",
-      "description": "Analyzes integrated platforms versus specialized tools for sales engagement and coaching workflows."
-    },
-    {
-      "title": "How to Use Hot Leads and Speed to Lead to Convert More Pipeline",
-      "url": "https://www.revenue.io/blog/hot-leads-and-speed-to-lead-to-convert-more-inbound-pipeline",
-      "date": "2026-05-22",
-      "description": "Emphasizes rapid prospect contact timing as a critical factor in inbound conversion success."
-    },
-    {
-      "title": "How to Handle Objections in Real Time With Live Battlecards and Alerts",
-      "url": "https://www.revenue.io/blog/objections-real-time-live-battlecards-alerts",
-      "date": "2026-05-22",
-      "description": "Details how real-time guidance surfaces competitive intelligence and objection responses during active calls."
-    },
-    {
-      "title": "Inbound vs Outbound Sales: Complete Guide for 2026",
-      "url": "https://www.revenue.io/blog/inbound-vs-outbound-sales",
-      "date": "2026-05-19",
-      "description": "Compares strategies, skills, tools, and metrics for both conversion and prospecting-focused sales motions."
-    }
-  ],
   "repo": "ringdna",
   "feeds": [
+    {
+      "source": "https://www.revenue.io/blog/feed",
+      "feed_url": "https://www.revenue.io/blog/feed",
+      "title": "",
+      "saved": 6,
+      "method": "feed"
+    },
     {
       "source": "https://www.linkedin.com/company/revenueio",
       "error": "HTTPError"
     }
   ],
-  "post_count": 0,
-  "fetched": "2026-06-14T20:42:17Z"
+  "fetched": "2026-06-27T12:03:07Z",
+  "post_count": 6
 }
