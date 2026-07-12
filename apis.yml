@@ -30,6 +30,10 @@ apis:
       - type: Documentation
         url: https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna
 common:
+  - type: TrustCenter
+    url: security/ringdna-trust-center.yml
+  - type: DomainSecurity
+    url: security/ringdna-domain-security.yml
   - type: Website
     url: https://www.revenue.io
   - type: Documentation
