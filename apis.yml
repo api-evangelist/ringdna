@@ -16,7 +16,7 @@ accessModel:
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/ringdna.png
 url: https://raw.githubusercontent.com/api-evangelist/ringdna/refs/heads/main/apis.yml
 created: '2026-06-13'
-modified: '2026-06-13'
+modified: '2026-08-14'
 specificationVersion: '0.19'
 tags:
   - Sales Engagement
@@ -31,16 +31,60 @@ tags:
 apis:
   - aid: ringdna:guided-selling-api
     name: RingDNA Guided Selling API
-    description: REST API endpoints for managing Guided Selling participant actions within Revenue.io sales engagement workflows, including completing and skipping participant steps in sales cadences.
-    humanURL: https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna
+    description: >-
+      Programmatic entry points into the Guided Selling managed package for
+      completing participant actions, skipping (deferring) participant actions,
+      and creating sequence-independent quick actions. These are NOT HTTP
+      endpoints: each is a Salesforce Apex class in the RDNACadence namespace,
+      also surfaced as a Flow invocable action, and is called from inside the
+      customer's own Salesforce org. Every entry point is bulk-first, taking a
+      list of request objects and returning a list of result objects carrying
+      success, errorMessage and the affected participant action IDs.
+    humanURL: https://support.revenue.io/guided-selling/salesforce-administration/api-endpoints/
     baseURL: https://api.ringdna.com
     tags:
       - Guided Selling
       - Sales Cadences
       - Sales Automation
+      - Salesforce Apex
     properties:
       - type: Documentation
-        url: https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna
+        url: https://support.revenue.io/guided-selling/salesforce-administration/api-endpoints/
+      - type: APIReference
+        url: https://support.revenue.io/guided-selling/salesforce-administration/api-endpoints/
+      - type: Conventions
+        url: conventions/ringdna-conventions.yml
+      - type: DataModel
+        url: data-model/ringdna-data-model.yml
+      - type: ErrorCatalog
+        url: errors/ringdna-error-codes.yml
+  - aid: ringdna:mcp-server
+    name: RingDNA MCP Server
+    description: >-
+      A live, remotely hosted Model Context Protocol server operated by
+      Revenue.io at https://app.ringdna.com/mcp. An MCP client can POST to it
+      today with no local install. It is protected by OAuth 2.1 with PKCE (S256)
+      and advertises the full modern discovery chain - RFC 9728 protected
+      resource metadata, RFC 8414 authorization server metadata, and RFC 7591
+      dynamic client registration, which returns 201 to an anonymous POST. The
+      server is entirely undocumented: it appears nowhere in the 753-page
+      Revenue.io Knowledge Center, nowhere in the marketing llms.txt, and in no
+      release note through July 2026. It was found by probing the well-known
+      surface. Its tool list is auth-gated (tools/list returns HTTP 401 with a
+      bearer challenge) and is deliberately not recorded rather than guessed.
+    humanURL: https://app.ringdna.com/.well-known/oauth-protected-resource
+    baseURL: https://app.ringdna.com/mcp
+    tags:
+      - MCP
+      - Model Context Protocol
+      - AI Agents
+    properties:
+      - type: MCPServer
+        url: mcp/ringdna-mcp.yml
+      - type: Authentication
+        url: authentication/ringdna-authentication.yml
+      - type: OAuthScopes
+        url: scopes/ringdna-scopes.yml
 common:
   - type: TrustCenter
     url: security/ringdna-trust-center.yml
@@ -49,7 +93,7 @@ common:
   - type: Website
     url: https://www.revenue.io
   - type: Documentation
-    url: https://support.revenue.io/s/topic/0TO60000000TtSEGA0/ringdna
+    url: https://support.revenue.io/
   - type: GitHubOrg
     url: https://github.com/ringdna
   - type: LinkedIn
@@ -68,6 +112,51 @@ common:
     url: rate-limits/ringdna-rate-limits.yml
   - type: FinOps
     url: finops/ringdna-finops.yml
+  - type: MCPServer
+    url: mcp/ringdna-mcp.yml
+  - type: LLMsTxt
+    url: llms/ringdna-llms.txt
+  - type: WellKnown
+    url: well-known/ringdna-well-known.yml
+  - type: Authentication
+    url: authentication/ringdna-authentication.yml
+  - type: OAuthScopes
+    url: scopes/ringdna-scopes.yml
+  - type: Packages
+    url: packages/ringdna-packages.yml
+  - type: Conformance
+    url: conformance/ringdna-conformance.yml
+  - type: Compliance
+    url: https://www.revenue.io/security
+  - type: ErrorCatalog
+    url: errors/ringdna-error-codes.yml
+  - type: Lifecycle
+    url: lifecycle/ringdna-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/ringdna-changelog.yml
+  - type: DataModel
+    url: data-model/ringdna-data-model.yml
+  - type: Conventions
+    url: conventions/ringdna-conventions.yml
+  - type: Sandbox
+    url: sandbox/ringdna-sandbox.yml
+  - type: APIReference
+    url: https://support.revenue.io/guided-selling/salesforce-administration/api-endpoints/
+  - type: GettingStarted
+    url: https://support.revenue.io/getting-started/
+  - type: Support
+    url: https://support.revenue.io
+  - type: SignUp
+    url: https://app.revenue.io/
+  - type: TermsOfService
+    url: https://www.revenue.io/msa
+  - type: PrivacyPolicy
+    url: https://www.revenue.io/privacy-policy
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-14'
+  status: enriched
+  artifacts_added: 15
+  pass: local-v1
