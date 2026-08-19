@@ -1,6 +1,19 @@
+generated: '2026-08-14'
+method: searched
+source: https://www.revenue.io/pricing
 name: RingDNA Plans and Pricing
 description: Revenue.io (formerly RingDNA) offers three tiered plans licensed on a per-user basis. All plans require Salesforce and are priced on a custom quote basis. Contact sales for current per-seat pricing.
 url: https://www.revenue.io/pricing
+plan_count: 3
+published_prices: false
+pricing_note: >-
+  The pricing page names three tiers and itemizes what each includes, but
+  publishes no number for any of them - every tier is a custom per-seat quote
+  behind "contact sales". There is no free tier, no trial, and no self-service
+  sign-up. A Salesforce licence is a prerequisite for all three tiers and is
+  billed separately.
+verified: '2026-08-14'
+verified_status: 200
 plans:
 
   - name: Activate

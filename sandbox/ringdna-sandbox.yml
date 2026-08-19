@@ -1,0 +1,88 @@
+generated: '2026-08-14'
+method: searched
+source: https://support.revenue.io/administration/managing-salesforce-configurations-and-settings/create-or-update-a-revenueio-sandbox/
+name: RingDNA / Revenue.io Sandbox
+description: >-
+  Revenue.io does provide a real test environment, but it is not a developer
+  sandbox with test keys and magic values - it is a paired Revenue.io account
+  bound to a customer's Salesforce sandbox org. There is no test-vs-live key
+  prefix, no test card or magic identifier set, and no time simulation. Access is
+  customer-only: a sandbox is created by logging into the Chrome extension with
+  Salesforce sandbox credentials, which means an unauthenticated developer cannot
+  reach one.
+
+model: paired-salesforce-sandbox
+self_service: partial
+public_access: false
+cost: >-
+  No additional charge. Sandbox licenses are provisioned free by Support, capped
+  at the number allocated to the production account.
+
+separation:
+  mechanism: connection-mode-selector
+  description: >-
+    The RingDNA Chrome extension exposes a connection method selector; choosing
+    "Sandbox" instead of the default "Production" at login is what routes the
+    session to the sandbox environment.
+  key_prefixes: []
+  key_prefix_note: >-
+    Revenue.io publishes no test/live API key prefix scheme. The Guided Selling
+    API Key and Secret are bound to a Salesforce Organization ID, and the sandbox
+    org has its own Org ID, so environment separation is by Org ID rather than by
+    credential prefix.
+
+creation:
+  steps:
+    - Install the "RingDNA by Revenue.io" Chrome Extension.
+    - Click the extension icon in Chrome and open RingDNA.
+    - Before logging in, select "Sandbox" as the connection method instead of "Production".
+    - Log in with Salesforce sandbox credentials. If the sandbox uses SSO, click "Use Custom Domain" and enter the sandbox Custom Domain.
+    - Input a US or Canadian area code to be allocated a Smart Number to test with.
+    - On first successful login the Revenue.io Sandbox is created; manage settings in the Admin Console.
+  isolation_note: >-
+    Settings and users do NOT map over from the production account. Revenue.io
+    Sandboxes are effectively new, empty instances.
+
+test_resources:
+  - name: Sandbox Smart Number
+    kind: allocated-phone-number
+    description: >-
+      A real phone number allocated to the sandbox on first login, selected by
+      supplying a US or Canadian area code. This is the closest thing Revenue.io
+      publishes to a test fixture - it is provisioned, not a published magic value.
+    published_values: []
+  - name: Sandbox user licenses
+    kind: provisioned-seats
+    description: >-
+      Additional sandbox users (reps, admins) are provisioned by Revenue.io
+      Support at no additional cost, capped at the production seat count.
+
+refresh_handling:
+  description: >-
+    Refreshing the Salesforce org can change the OrgID and UserID, which breaks
+    the link between the Salesforce sandbox and the Revenue.io sandbox.
+  remediation: >-
+    Provide Revenue.io Support with the new OrgID and UserID so the sandbox is
+    re-linked. For Guided Selling specifically, a partial-copy sandbox refresh can
+    change the Organization ID and invalidate the API Key/Secret, producing an
+    "Uh Oh! License required." message; Support must update the Salesforce
+    Organization ID on the Revenue.io account.
+  required_info:
+    - New Salesforce Organization ID (e.g. 00D600...)
+    - RingDNA Account ID (from the Account Overview page in the sandbox account)
+  docs: https://support.revenue.io/guided-selling/salesforce-administration/installation-and-setup/setup-api-credentials/
+
+notification_testing:
+  description: >-
+    Conversation AI and Moments notifications can be test-triggered from the
+    product, including in a non-default language.
+  docs:
+    - https://support.revenue.io/conversation-ai/troubleshooting/how-to-test-trigger-a-notification/
+    - https://support.revenue.io/conversation-ai/troubleshooting/how-to-test-a-notification-in-a-different-language/
+
+not_available:
+  - No public sandbox, demo tenant, or API playground reachable without a Salesforce org and a Revenue.io license.
+  - No test card numbers, test bank accounts, or magic test identifiers (not a payments API).
+  - No test clocks or time simulation.
+  - No fixture/trigger CLI or seeding tooling.
+  - No sandbox for the MCP server at https://app.ringdna.com/mcp - it authenticates against a live tenant.

@@ -1,0 +1,158 @@
+generated: '2026-08-14'
+method: searched
+source: https://support.revenue.io/guided-selling/reference-architecture/object-architecture/
+name: RingDNA / Revenue.io Guided Selling Data Model
+description: >-
+  Revenue.io publishes a genuine, field-level object reference for Guided
+  Selling - the entity graph, the Salesforce API names, the data types and the
+  relationships. Because Revenue.io is 100% Salesforce-native, this data model IS
+  the integration contract: there is no REST resource model to derive from an
+  OpenAPI, so anything reading or writing Guided Selling data does it through
+  these Salesforce objects (SOQL, Bulk API, Apex, or Flow). Captured verbatim
+  from the Object Architecture reference; nothing here is inferred.
+
+platform: salesforce
+namespace: RDNACadence
+namespace_secondary: ringdna
+render: >-
+  Revenue.io publishes a Mermaid flowchart of the object relationships on the
+  Object Architecture index page.
+
+entities:
+  - name: Sequence
+    api_name: RDNACadence__Cadence__c
+    kind: custom-object
+    description: Container object defining the sequence template, rules, and configuration.
+    primary_use: Sequence definition and management
+    docs: https://support.revenue.io/guided-selling/reference-architecture/object-architecture/sequence/
+    fields:
+      - {label: Name, api_name: Name, type: 'Text(80)', purpose: Display name of the Cadence}
+      - {label: Status, api_name: RDNACadence__Status__c, type: Checkbox, purpose: 'Indicates whether the Cadence is a draft, active, or inactive'}
+      - {label: Participant Activation, api_name: RDNACadence__Participent_Activation__c, type: Picklist, purpose: 'Controls how participants are activated (manual, automatic)'}
+      - {label: Entrance Criteria, api_name: RDNACadence__Entrance_Criteria__c, type: 'Long Text Area(32768)', purpose: Full JSON/serialized definition of criteria required to enroll a participant}
+      - {label: Exit Criteria, api_name: RDNACadence__Exit_Criteria__c, type: 'Long Text Area(32768)', purpose: Full JSON/serialized definition of criteria that trigger participant removal}
+      - {label: Entrance Criteria PE, api_name: RDNACadence__Entrance_Criteria_PE__c, type: 'Text(255)', purpose: Process-engine representation of the entrance criteria}
+      - {label: Owner, api_name: OwnerId, type: 'Lookup(User, Group)', purpose: User responsible for creating the Sequence}
+    limits:
+      participants_max: 20000
+      docs: https://support.revenue.io/guided-selling/reference-architecture/limits-and-guardrails/sequence-limit-20k/
+
+  - name: Action
+    api_name: RDNACadence__CadenceAction__c
+    kind: custom-object
+    description: >-
+      Template object defining an individual step within a sequence - call, email,
+      SMS, task or other supported type, with timing and step-level activation
+      behaviour. Reusable definitions, NOT the per-participant rows on a lead or
+      contact timeline.
+    primary_use: Action configuration and templates
+    docs: https://support.revenue.io/guided-selling/reference-architecture/object-architecture/action/
+    fields:
+      - {label: Name, api_name: Name, type: 'Text(80)', purpose: Display name of the Action}
+      - {label: Sequence Id, api_name: RDNACadence__Cadence_Id__c, type: 'Master-Detail(Sequence)', purpose: Parent lookup to the Sequence this action belongs to}
+      - {label: Type, api_name: RDNACadence__Type__c, type: Picklist, purpose: 'Action type (call, email, SMS, task)'}
+      - {label: Index, api_name: RDNACadence__Index__c, type: 'Number(18, 0)', purpose: Ordinal position of this action within the sequence}
+      - {label: Priority, api_name: RDNACadence__Priority__c, type: Picklist, purpose: 'Priority tier (high, normal, low)'}
+      - {label: Trigger Type, api_name: RDNACadence__Trigger_Type__c, type: Picklist, purpose: 'How the action is triggered (immediate or time based)'}
+      - {label: Activation Type, api_name: RDNACadence__ActivationType__c, type: Picklist, purpose: 'How the action becomes active (manual or automatic)'}
+    action_types:
+      - Call
+      - Email
+      - SMS
+      - Task
+
+  - name: Participant
+    api_name: null
+    kind: standard-object
+    description: Standard Salesforce Lead or Contact records; the target of sequence enrollment.
+    primary_use: Target records for sequence enrollment
+    backing_objects:
+      - Lead
+      - Contact
+
+  - name: Sequence Association
+    api_name: RDNACadence__Sequence_Association__c
+    kind: custom-object
+    description: >-
+      The enrollment record linking a Sequence to a Participant. Created when a
+      participant enters a sequence; tracks status, entry date, delegation, and
+      the relationship to participant actions.
+    primary_use: Enrollment tracking and metadata
+    docs: https://support.revenue.io/guided-selling/reference-architecture/object-architecture/sequence-association/
+    fields:
+      - {label: Sequence Association Name, api_name: Name, type: Auto Number, purpose: System-generated unique name}
+      - {label: Sequence, api_name: RDNACadence__Sequence__c, type: 'Lookup(Sequence)', purpose: The parent Sequence}
+      - {label: Participant ID, api_name: RDNACadence__Participant_ID__c, type: 'Formula (Text)', purpose: Derived identifier for the Contact or Lead}
+      - {label: Association Status, api_name: RDNACadence__Association_Status__c, type: 'Text(50) (External ID)', purpose: 'Current enrollment state (active, completed)'}
+      - {label: Sequence Entry Date, api_name: RDNACadence__Sequence_Entry_Date__c, type: Date/Time, purpose: When the participant was enrolled}
+    enrollment_paths:
+      - {participant: Lead, mode: direct, via: Lead record (Lead sequence)}
+      - {participant: Lead, mode: indirect, via: Campaign member (Campaign sequence)}
+      - {participant: Contact, mode: direct, via: Contact record (Contact sequence)}
+      - {participant: Contact, mode: indirect, via: Campaign member (Campaign sequence)}
+      - {participant: Contact, mode: indirect, via: Opportunity Contact Role record (Opportunity sequence)}
+
+  - name: Participant Action
+    api_name: RDNACadence__Sequence_Action__c
+    kind: custom-object
+    description: >-
+      The instance record of an Action for a specific participant - the unit of
+      work a rep executes. This is the object the three documented Guided Selling
+      API endpoints operate on.
+    primary_use: Individual action execution tracking
+    docs: https://support.revenue.io/guided-selling/reference-architecture/object-architecture/participant-action/
+    fields:
+      - {label: Participant Action Name, api_name: Name, type: 'Text(80)', purpose: Display name, typically inheriting the step name}
+      - {label: Status, api_name: RDNACadence__Status__c, type: 'Formula (Text)', purpose: 'Derived status label (Upcoming, On Engage, Completed, Skipped, Auto Skipped)'}
+      - {label: Expected Execution Date, api_name: RDNACadence__Expected_Execution_Date__c, type: Date/Time, purpose: Scheduled due date/time}
+      - {label: Actual Execution Date, api_name: RDNACadence__Actual_Execution_Date__c, type: Date/Time, purpose: When the action was actually executed}
+      - {label: Sequence Association, api_name: RDNACadence__Sequence_Association__c, type: 'Lookup(Sequence Association)', purpose: Ties this action to its participant enrollment}
+      - {label: Sequence ID, api_name: RDNACadence__Sequence_Id__c, type: 'Formula (Text)', purpose: Salesforce ID of the parent Sequence}
+      - {label: Sequence Active, api_name: RDNACadence__Sequence_Active__c, type: 'Formula (Checkbox)', purpose: Whether the parent Sequence is currently active}
+      - {label: System Deferral Reason, api_name: System_Deferral_Reason__c, type: Picklist, purpose: Why the action was not processed as scheduled}
+      - {label: Owner, api_name: OwnerId, type: 'Lookup(User, Group)', purpose: The rep assigned to execute this action}
+    enumerations:
+      status: errors/ringdna-error-codes.yml#participant_action_statuses
+      system_deferral_reason: errors/ringdna-error-codes.yml#deferral_reasons
+
+  - name: Conversation
+    api_name: ringdna__Conversation__c
+    kind: custom-object
+    description: Outcome record capturing interaction results; created when a Participant Action completes.
+    primary_use: Activity logging and reporting
+    namespace: ringdna
+
+relationships:
+  - {from: Sequence, to: Action, type: has_many, via: RDNACadence__Cadence_Id__c, cardinality: master-detail, note: A sequence owns its ordered collection of step templates.}
+  - {from: Sequence, to: Sequence Association, type: has_many, via: RDNACadence__Sequence__c, note: One association is created per participant on enrollment.}
+  - {from: Sequence Association, to: Participant, type: belongs_to, via: RDNACadence__Participant_ID__c, note: Resolves to a standard Lead or Contact.}
+  - {from: Sequence Association, to: Participant Action, type: has_many, via: RDNACadence__Sequence_Association__c, note: Each enrollment fans out into per-participant action rows.}
+  - {from: Action, to: Participant Action, type: has_many, via: template, note: Each Action template instantiates a Participant Action per enrolled participant.}
+  - {from: Participant, to: Participant Action, type: has_many, via: enrollment}
+  - {from: Participant Action, to: Conversation, type: has_one, via: completion, note: Completing a participant action creates a Conversation outcome record.}
+  - {from: Sequence, to: User, type: belongs_to, via: OwnerId}
+  - {from: Participant Action, to: User, type: belongs_to, via: OwnerId, note: The rep assigned to execute.}
+
+criteria_model:
+  description: >-
+    Entrance and exit criteria are stored as serialized JSON on the Sequence.
+    Which fields are addressable depends on the sequence record type and on the
+    Revenue.io Sequence field sets configured in the org.
+  docs: https://support.revenue.io/guided-selling/reference-architecture/object-architecture/supported-fields-and-operators/
+  record_types: [Lead, Contact, Opportunity, Campaign]
+  field_sets:
+    - Revenue.io Sequence Leads
+    - Revenue.io Sequence Contacts
+  operators_by_field_type:
+    - {field_type: 'Phone, Boolean, Email, Reference', operators: [Does Not Equal, Equals]}
+    - {field_type: 'Multipicklist, Picklist', operators: [Does Not Include, Includes]}
+    - {field_type: 'Date, DateTime', operators: [Previous, Next, Current, Before, After, On, Between, IsEmpty]}
+    - {field_type: 'Number (Double, Integer, Currency)', operators: [Does not equal, Equals, Greater than, Greater than or equal, Less than, Less than or Equal]}
+    - {field_type: 'String (everything else)', operators: [Contains, Includes, Does not equal, Equals, Starts with]}
+
+audit_fields:
+  note: Every custom object carries the Salesforce standard audit field set.
+  fields: [Id, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp]
+
+entity_count: 6
+relationship_count: 9

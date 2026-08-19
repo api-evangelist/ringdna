@@ -1,0 +1,212 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  https://www.revenue.io/security plus live probes of the RingDNA MCP discovery
+  documents at app.ringdna.com
+name: RingDNA / Revenue.io Conformance
+description: >-
+  Two very different conformance stories sit side by side here. On the security
+  and compliance side Revenue.io publishes a named, audited program (SOC 2,
+  HIPAA, GDPR, CCPA, TCPA, CASA Tier 2). On the API standards side there is
+  almost nothing to assert: no OpenAPI, no AsyncAPI, no GraphQL, no JSON:API, no
+  RFC 9457 problem details, no REST API of any kind on a Revenue.io-controlled
+  host. The one bright spot is the MCP server, which implements the modern OAuth
+  discovery stack correctly and completely.
+
+standards:
+  - id: mcp
+    name: Model Context Protocol
+    conforms: true
+    evidence: >-
+      Live remote MCP server at https://app.ringdna.com/mcp. POST tools/list
+      returns HTTP 401 with a spec-correct
+      WWW-Authenticate: Bearer resource_metadata="..." challenge, which is the
+      MCP authorization handshake behaving exactly as specified.
+    method: probed
+
+  - id: oauth2
+    name: OAuth 2.0 / 2.1 authorization code
+    conforms: true
+    evidence: >-
+      authorization_code + refresh_token grants declared at
+      https://app.ringdna.com/.well-known/oauth-authorization-server. Salesforce
+      Connected App OAuth is separately documented for the platform integration.
+    method: probed
+
+  - id: rfc8414
+    name: OAuth 2.0 Authorization Server Metadata
+    conforms: true
+    evidence: >-
+      https://app.ringdna.com/.well-known/oauth-authorization-server returns 200
+      application/json with issuer, authorization_endpoint, token_endpoint,
+      registration_endpoint, grant_types_supported, response_types_supported,
+      code_challenge_methods_supported and scopes_supported.
+    method: probed
+
+  - id: rfc9728
+    name: OAuth 2.0 Protected Resource Metadata
+    conforms: true
+    evidence: >-
+      https://app.ringdna.com/.well-known/oauth-protected-resource returns 200
+      with resource, authorization_servers, bearer_methods_supported and
+      scopes_supported. The path-suffixed variant /.well-known/oauth-protected-resource/mcp
+      named in the WWW-Authenticate challenge also resolves.
+    method: probed
+
+  - id: rfc7591
+    name: OAuth 2.0 Dynamic Client Registration
+    conforms: true
+    evidence: >-
+      registration_endpoint https://app.ringdna.com/mcp/oauth/register is
+      advertised and returned HTTP 201 to an anonymous POST.
+    method: probed
+
+  - id: rfc7636
+    name: PKCE
+    conforms: true
+    evidence: 'code_challenge_methods_supported: ["S256"] in the authorization server metadata.'
+    method: probed
+
+  - id: rfc8615
+    name: Well-Known URIs
+    conforms: partial
+    evidence: >-
+      app.ringdna.com serves OAuth metadata at well-known paths, and
+      www.revenue.io serves /llms.txt. But support.revenue.io answers HTTP 200
+      with an HTML shell for every /.well-known/* path, which is a soft-404 that
+      actively pollutes the discovery surface.
+    method: probed
+
+  - id: openid-connect
+    name: OpenID Connect Discovery
+    conforms: false
+    evidence: >-
+      /.well-known/openid-configuration returns 404 on app.ringdna.com,
+      api.revenue.io, www.revenue.io and ringdna.com.
+    method: probed
+
+  - id: openapi
+    name: OpenAPI
+    conforms: false
+    evidence: >-
+      No OpenAPI or Swagger document found. Probed /openapi.json, /openapi.yaml,
+      /swagger.json, /v1/openapi.json, /api-docs, /docs and /redoc against
+      api.ringdna.com (NXDOMAIN), api.revenue.io (all 404), app.ringdna.com (all
+      404) and www.revenue.io (404). Zero occurrences of "OpenAPI", "Swagger" or
+      "Postman" across 753 indexed Knowledge Center pages.
+    method: probed
+
+  - id: asyncapi
+    name: AsyncAPI
+    conforms: false
+    evidence: >-
+      No event, streaming or webhook surface is documented. Zero matches for
+      "webhook" across the Knowledge Center index.
+    method: searched
+
+  - id: graphql
+    name: GraphQL
+    conforms: false
+    evidence: /graphql returns 404 on api.revenue.io and app.ringdna.com.
+    method: probed
+
+  - id: rfc9457
+    name: Problem Details for HTTP APIs
+    conforms: false
+    evidence: >-
+      No application/problem+json anywhere. Errors surface either as Salesforce
+      platform error codes (REQUIRED_FIELD_MISSING, UNABLE_TO_LOCK_ROW, ...) or
+      as a Guided Selling Apex result object with a boolean `success` and a
+      string `errorMessage`. See errors/ringdna-error-codes.yml.
+    method: searched
+
+  - id: rfc8594
+    name: Sunset HTTP Header / deprecation signalling
+    conforms: false
+    evidence: >-
+      No deprecation policy, no Sunset or Deprecation header documentation, and
+      no versioning policy page found in the Knowledge Center.
+    method: searched
+
+  - id: rfc9116
+    name: security.txt
+    conforms: false
+    evidence: >-
+      /.well-known/security.txt returns 404 on www.revenue.io, ringdna.com,
+      app.ringdna.com and api.revenue.io.
+    method: probed
+
+  - id: soc2
+    name: SOC 2
+    conforms: true
+    evidence: >-
+      "Revenue.io is SOC II compliant and is subject to rigorous, consistent
+      security testing" - https://www.revenue.io/security
+    method: searched
+
+  - id: hipaa
+    name: HIPAA
+    conforms: true
+    evidence: >-
+      "Revenue.io meets core security requirements for the HIPAA security rule.
+      Revenue.io is a Business Associate under HIPAA" - https://www.revenue.io/security
+    method: searched
+
+  - id: gdpr
+    name: GDPR
+    conforms: true
+    evidence: >-
+      Named on https://www.revenue.io/security; a Data Protection Addendum is
+      published at https://www.revenue.io/dpa
+    method: searched
+
+  - id: ccpa
+    name: CCPA / CPRA
+    conforms: true
+    evidence: Named on https://www.revenue.io/security and in the Global Privacy Policy.
+    method: searched
+
+  - id: tcpa
+    name: TCPA
+    conforms: true
+    evidence: >-
+      "Revenue.io helps companies adhere to various key requirements. For
+      example, Call and SMS Blocklists restrict calls to various phone numbers
+      based on automatic spam detection or user-specified compliance parameters."
+      - https://www.revenue.io/security
+    method: searched
+
+  - id: casa-tier-2
+    name: App Defense Alliance CASA Tier 2
+    conforms: true
+    evidence: >-
+      "The Revenue.io Platform is CASA Tier 2 Certified ... passed a rigorous
+      independent security assessment validating it can safely and securely
+      handle Google user data. Administered by the App Defense Alliance."
+      - https://www.revenue.io/security (announced 2026-07-14 on the blog)
+    method: searched
+
+compliance_program:
+  published: true
+  url: https://www.revenue.io/security
+  certifications:
+    - SOC 2
+    - HIPAA
+    - GDPR
+    - CCPA
+    - CPRA
+    - TCPA
+    - CASA Tier 2
+  artifacts:
+    - name: Security Datasheet
+      url: https://www.revenue.io/security
+      gated: true
+      note: Offered as a download from the security page.
+    - name: Data Protection Addendum
+      url: https://www.revenue.io/dpa
+    - name: Master Service Agreement
+      url: https://www.revenue.io/msa
+  controls:
+    - Systems run inside a dedicated Virtual Private Cloud with environment separation and auditing
+    - Custom data retention policies configurable by administrators
+    - Role-based access control

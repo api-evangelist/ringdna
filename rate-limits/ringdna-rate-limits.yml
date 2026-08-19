@@ -1,9 +1,113 @@
+generated: '2026-08-14'
+method: searched
+source: https://support.revenue.io/guided-selling/reference-architecture/limits-and-guardrails/
 name: RingDNA Rate Limits
-description: Revenue.io (formerly RingDNA) does not publish explicit public API rate limit documentation. Rate limits are enforced at the platform level and may vary by plan and integration. As a Salesforce-native platform, API usage is also subject to Salesforce API governor limits. Contact Revenue.io support for specific rate limit guidance applicable to your deployment.
-url: https://support.revenue.io
+description: >-
+  Revenue.io publishes no HTTP rate limits, because it exposes no public HTTP API
+  and therefore returns no rate-limit headers. What it does publish - and what
+  the previous round of this artifact missed - is a real "Limits and Guardrails"
+  reference for Guided Selling with hard, numeric application limits, plus
+  guidance on the Salesforce API governor limits that actually throttle the
+  platform. Those are recorded below. The runtime signal an integrator gets is a
+  Salesforce error code, not a header.
+url: https://support.revenue.io/guided-selling/reference-architecture/limits-and-guardrails/
+limit_count: 4
+
+rate_limits:
+  - name: Email send rate
+    scope: per-tenant
+    limit: 20
+    unit: emails
+    window: 1 minute
+    enforcement: hard
+    configurable: false
+    reason: Applied unconditionally to avoid Email Service Provider (ESP) throttling.
+    quote: >-
+      "To avoid Email Service Provider (ESP) throttling, Guided Selling will
+      always limit emails sent to 20 per minute."
+    docs: https://support.revenue.io/guided-selling/reference-architecture/limits-and-guardrails/email-limits-and-throttling/
+
+  - name: Per-user daily email limit
+    scope: per-user
+    limit: null
+    unit: emails
+    window: 1 day
+    enforcement: configurable
+    configurable: true
+    configured_at: Salesforce > Guided Selling > Sequence Settings > Email > "Limit for number of emails sent per day"
+    overflow_behavior: Additional emails are rescheduled for the next day rather than rejected.
+    guidance: >-
+      Revenue.io advises checking the customer's own ESP ceiling first - it cites
+      most Gmail accounts at 500/day and Microsoft at 10,000/day - and leaving
+      headroom for email activity outside Guided Selling.
+    docs: https://support.revenue.io/guided-selling/salesforce-administration/configure-settings/app-settings/email-and-send-limits/
+
+  - name: Sequence participant capacity
+    scope: per-sequence
+    limit: 20000
+    unit: participants
+    window: concurrent
+    enforcement: hard
+    configurable: false
+    overflow_behavior: >-
+      No new participants can be added until existing participants exit.
+      Automatic sequences stop adding; manual addition is blocked. For an
+      automatic sequence matching more than 20,000 records, only 20,000 are added
+      and the selection order is NOT deterministic. Existing participants continue
+      to be processed normally.
+    reason: Enforced to ensure optimal performance and system stability.
+    docs: https://support.revenue.io/guided-selling/reference-architecture/limits-and-guardrails/sequence-limit-20k/
+
+  - name: Salesforce API request allocation
+    scope: per-salesforce-org
+    limit: null
+    unit: API requests
+    window: rolling 24 hours
+    enforcement: hard
+    owner: Salesforce
+    note: >-
+      This is the limit that actually governs Revenue.io throughput. Revenue.io is
+      an external application that consumes the customer's Salesforce API
+      allocation for every synced transaction, and it shares that allocation with
+      every other integration in the org. The numeric ceiling is set by the
+      customer's Salesforce edition and licence count, not by Revenue.io.
+    attribution: >-
+      All API calls consumed by Revenue.io are attributed to the Salesforce client
+      ID "Revenue Intelligence by Revenue.io".
+    monitoring:
+      - Setup > System Overview > API Calls (last 24 hours, whole org)
+      - 'Reports > Administrative Reports > "API Usage Last 7 days" (by user and date)'
+      - Setup > Integrations > API Usage Notifications (threshold alerts)
+    docs: https://support.revenue.io/administration/managing-salesforce-configurations-and-settings/monitor-your-salesforce-api-usage/
+
+response_signaling:
+  headers: []
+  header_note: >-
+    NO rate-limit response headers are published or observable. There is no
+    X-RateLimit-*, no RateLimit-*, and no Retry-After, because the Guided Selling
+    surface is Salesforce Apex rather than HTTP. An agent cannot read a remaining
+    budget at runtime.
+  exhaustion_signal:
+    kind: salesforce-error-code
+    code: REQUEST_LIMIT_EXCEEDED
+    description: >-
+      Returned when the org exceeds its 24-hour API allocation. This is the only
+      runtime exhaustion signal available.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/request-limit-exceeded/
+  concurrency_signal:
+    kind: salesforce-error-code
+    code: UNABLE_TO_LOCK_ROW
+    retry: automatic, up to 3 attempts
+
+mcp:
+  endpoint: https://app.ringdna.com/mcp
+  limits_published: false
+  note: >-
+    No rate limits are published or advertised for the MCP server, and none could
+    be observed - anonymous requests are rejected with HTTP 401 before any
+    rate-limit header would be emitted.
+
 notes:
-  - Revenue.io is 100% Salesforce-native; all data flows through Salesforce APIs
-  - Salesforce API call limits apply to all Revenue.io integrations
-  - Platform-level throttling is managed internally; contact support for details
-  - Guided Selling API endpoints (Complete/Skip Participant Action) may have per-org limits
-  - No publicly documented rate limit tiers as of 2026-06-13
+  - Revenue.io is 100% Salesforce-native; all data flows through the Salesforce APIs.
+  - No plan-tiered API quotas are published on the pricing page.
+  - The previous version of this artifact recorded "no publicly documented rate limits"; that was incomplete - four are published and are captured above.

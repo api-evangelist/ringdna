@@ -1,0 +1,109 @@
+generated: '2026-08-14'
+method: searched
+source: https://support.revenue.io/releases/
+name: RingDNA / Revenue.io Changelog
+description: >-
+  Revenue.io maintains a dated, public product-update feed on the Knowledge
+  Center, published roughly monthly, alongside a separate named-release archive
+  for the Guided Selling managed package. The feed is narrative rather than
+  API-shaped - it describes features, not endpoint or schema changes - and it
+  carries no breaking-change section, because there is no versioned public API to
+  break.
+
+url: https://support.revenue.io/releases/
+whats_new: https://support.revenue.io/whats-new/
+rss: https://support.revenue.io/releases/index.xml
+scheme: dated-monthly
+current_version: 'July 2026'
+package_release_train: V12 (Winter 2026)
+
+entries:
+  - date: '2026-07-27'
+    title: 'Revenue.io Product Updates: July 2026'
+    url: https://support.revenue.io/releases/revenueio-product-updates-july-2026/
+    breaking: false
+    highlights:
+      - 'Revenue app: mobile web access extended to Libraries, Saved Searches, Moments (creation and templates), Scorecards list, Opportunities, Accounts and Conversation Agents.'
+      - 'Insights reports: new Manage Columns menu so wide report tables stay readable.'
+      - 'Revenue AI: out-of-the-box Conversation Agents now traverse relationships to resolve Account and Contact field mappings (e.g. writing an Account field when the related record is an Opportunity, via Opportunity.AccountId).'
+      - 'Conversation AI and Moments: added language support for Bulgarian, Czech, Hungarian and Romanian.'
+
+  - date: '2026-06-08'
+    title: 'Revenue.io Product Updates: June 2026'
+    url: https://support.revenue.io/releases/revenueio-product-updates-june-2026/
+    breaking: false
+    highlights:
+      - 'Out-of-the-box Conversation Agents automatically extract structured insights from conversations without manual review.'
+
+  - date: '2026-05-15'
+    title: 'Revenue.io Product Updates: May 2026'
+    url: https://support.revenue.io/releases/revenueio-product-updates-may-2026/
+    breaking: false
+    highlights:
+      - Mobile-friendly conversation records.
+      - Dialer reliability improvements.
+      - Smarter opportunity linking.
+      - Tighter integrations.
+
+  - date: '2026-04-01'
+    title: 'Revenue.io Product Updates: April 2026'
+    url: https://support.revenue.io/releases/revenueio-product-updates-april-2026/
+    breaking: false
+    highlights:
+      - Updates for understanding customer engagement, faster access to key contact information, and insights that improve sales performance.
+
+  - date: '2026-03-10'
+    title: 'Revenue.io Product Updates: March 10th 2026'
+    url: https://support.revenue.io/releases/
+    breaking: false
+    highlights:
+      - More granular scorecard performance filters.
+
+  - date: '2026-01-29'
+    title: 'Revenue.io Product Updates: January 29th 2026'
+    url: https://support.revenue.io/releases/
+    breaking: false
+    highlights:
+      - Self-service scorecards.
+      - Richer analytics filters and clearer impact reporting.
+      - Faster conversation search.
+      - More control over meeting recordings and report time zones.
+
+  - date: '2025-12-11'
+    title: 'Revenue.io Product Updates: December 11th 2025'
+    url: https://support.revenue.io/releases/
+    breaking: false
+    highlights:
+      - Refreshed admin experience.
+      - RingDNA reports in Insights.
+      - Tighter scorecard visibility and expanded scorecard targeting.
+      - Richer X-Ray summaries.
+      - 'Role-based Moments notifications.'
+
+package_releases:
+  - version: V12
+    title: Guided Selling Winter 2026 Release (V12)
+    url: https://support.revenue.io/guided-selling/release-notes/guided-selling-winter-2025-release-v12/
+    breaking: false
+    highlights:
+      - Builds on the just-in-time foundation from V11.
+      - Clearer work visibility in Engage.
+      - More flexible scheduling.
+      - New Quick Action types.
+  - version: V11
+    title: Guided Selling Summer 2025 Release (V11)
+    url: https://support.revenue.io/guided-selling/release-notes/guided-selling-summer-2025-release-v11/
+  - version: V10
+    title: Guided Selling Summer 2024 Release (V10)
+    url: https://support.revenue.io/guided-selling/release-notes/guided-selling-summer-2024-release-v10/
+  - version: V9
+    title: Guided Selling March 2024 Release (V9)
+    url: https://support.revenue.io/guided-selling/release-notes/guided-selling-march-2024-release-v9/
+
+notes:
+  - >-
+    No API changelog exists. Nothing in the feed announces an endpoint, schema or
+    contract change, and there is no breaking-change or migration section.
+  - >-
+    The live MCP server at https://app.ringdna.com/mcp has never been mentioned in
+    any release note through July 2026.

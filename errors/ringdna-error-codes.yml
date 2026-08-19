@@ -1,0 +1,307 @@
+generated: '2026-08-14'
+method: searched
+source: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/
+name: RingDNA / Revenue.io Error Catalog
+description: >-
+  Revenue.io publishes no HTTP error reference, because it exposes no public HTTP
+  API. What it does publish is a real, curated error catalog of the failure modes
+  customers actually hit, and it comes in three layers: the Salesforce platform
+  error codes Revenue.io surfaces when a write to the customer's CRM is rejected;
+  the Guided Selling Apex result object; and the System Deferral Reason
+  enumeration that explains why a scheduled participant action did not run. All
+  three are recorded here. This is the non-payments sibling of a decline-code
+  catalog.
+
+format: vendor-specific
+envelope:
+  http: false
+  note: >-
+    Not RFC 9457. No application/problem+json is served anywhere. Errors reach the
+    customer either as a Salesforce platform error code echoed into the Revenue.io
+    UI and account logs, or as an Apex result object.
+  apex_result_object:
+    description: >-
+      Returned by every documented Guided Selling invocable/Apex entry point
+      (CompleteActionResult, SkipActionResult, QuickActionResult).
+    fields:
+      - name: success
+        type: boolean
+        description: Whether the operation completed successfully.
+      - name: errorMessage
+        type: string
+        description: Error message when the operation failed.
+      - name: participantActionId
+        type: Id
+        description: The ID of the affected participant action.
+      - name: successfulIds
+        type: List
+        description: IDs that succeeded in a bulk request.
+      - name: errors
+        type: List
+        description: Per-record errors in a bulk request.
+    error_mode_switch:
+      setting: GS_PublicSettings__c.logging_throwExceptions__c
+      label: Throw exceptions
+      description: >-
+        When true, an Apex exception is thrown on error. When false, the error is
+        returned in errorMessage on the result object instead. This is a
+        customer-configurable choice between exception-based and
+        return-value-based error handling - unusual, and worth knowing before
+        writing any Flow or Apex against these endpoints.
+    source: https://support.revenue.io/guided-selling/salesforce-administration/api-endpoints/
+
+problems:
+  - code: API_CURRENTLY_DISABLED
+    title: API access is disabled for this User
+    layer: salesforce-platform
+    surfaced_as: 'Could not start session with RingDNA server: Salesforce error: [API_CURRENTLY_DISABLED] API is disabled for this User'
+    cause: >-
+      API access is disabled for the Salesforce user, usually at the Profile
+      level. Revenue.io is an external application and uses the Salesforce API
+      for syncing and license verification, so it cannot confirm the user may log
+      in.
+    remediation: >-
+      Grant API access at the Profile level (preferred) by checking "API Enabled",
+      or via a Permission Set.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/api-access-is-disabled-for-this-user/
+
+  - code: REQUEST_LIMIT_EXCEEDED
+    title: Request Limit Exceeded
+    layer: salesforce-platform
+    class: rate-limit
+    cause: >-
+      The customer's Salesforce org has exceeded its 24-hour rolling API request
+      allocation. Causes include multiple integrated systems sharing the
+      allocation, inefficient queries, frequent automation, and unbatched mass
+      updates.
+    remediation: >-
+      Identify high-consumption clients under Setup > System Overview > API Usage
+      ("View by User" / "View by Client"); set up API Usage Notifications; reduce
+      or batch calls. Revenue.io traffic is attributed to the client ID
+      "Revenue Intelligence by Revenue.io".
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/request-limit-exceeded/
+    see_also: rate-limits/ringdna-rate-limits.yml
+
+  - code: UNABLE_TO_LOCK_ROW
+    title: Unable To Lock Row
+    layer: salesforce-platform
+    class: concurrency
+    cause: >-
+      Multiple processes attempted to modify the same Salesforce record
+      simultaneously - concurrent user edits, competing workflows or Apex
+      triggers, batch/import jobs, or another integration writing at the same
+      moment.
+    remediation: >-
+      The system automatically retries the sync up to three times, which clears
+      most transient conflicts. Otherwise filter Account Settings Logs to
+      Salesforce errors and retry manually.
+    retry:
+      automatic: true
+      attempts: 3
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/unable-to-lock-row/
+
+  - code: INSUFFICIENT_ACCESS_OR_READONLY
+    title: Insufficient Access or Invalid Fields
+    layer: salesforce-platform
+    class: authorization
+    aliases:
+      - INVALID_FIELD
+      - INVALID_FIELD_FOR_INSERT_UPDATE
+    cause: >-
+      Revenue.io attempted to write to Salesforce records or fields with
+      restricted permissions or set to Read Only, so Salesforce blocked the
+      update and the activity was not logged.
+    remediation: >-
+      Verify the "RingDNA Agent for Salesforce" permission set is assigned to all
+      Revenue.io users, then correct field-level security so the required fields
+      are editable.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/insufficient-access-or-invalid-fields/
+
+  - code: INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY
+    title: Insufficient Access On Cross Reference Entity
+    layer: salesforce-platform
+    class: authorization
+    cause: >-
+      A user or the integration lacked permission on a cross-referenced record -
+      typically creating a Task related to a record the user cannot access, or
+      updating a field that is read-only for that user.
+    remediation: Grant the required object-level CRUD and field-level permissions.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/insufficient-access-on-cross-reference-entity/
+
+  - code: REQUIRED_FIELD_MISSING
+    title: Required Field Missing
+    layer: salesforce-platform
+    class: validation
+    cause: >-
+      Revenue.io created or updated a record without a field the customer's org
+      marks required - often a field made required after the integration was
+      configured.
+    remediation: >-
+      Identify the field from the Revenue.io error logs and Salesforce audit logs,
+      then either relax the requirement, supply a default, or map a Revenue.io
+      field to it.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/required-field-missing/
+
+  - code: STRING_TOO_LONG
+    title: String Too Long
+    layer: salesforce-platform
+    class: validation
+    surfaced_as: 'Error updating record: {{Field Name}}: data value too large: {{Value Sent}} (max length={{MaxLength}}) (STRING_TOO_LONG)'
+    cause: Text sent by Revenue.io exceeds the target Salesforce field's character limit.
+    remediation: >-
+      Identify the field from the account logs, compare the value length to the
+      field limit, and either increase the field length or shorten the source data.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/string-too-long/
+
+  - code: FIELD_INTEGRITY_EXCEPTION
+    title: Field Integrity Exception
+    layer: salesforce-platform
+    class: validation
+    cause: >-
+      Data does not match the expected format or type. Common triggers: logging an
+      Activity to a Lead (WhoID) while relating it to an Account, Opportunity or
+      Campaign (WhatID), which Salesforce forbids; inserting an ID of the wrong
+      sObject type into a reference field; date/time format mismatches.
+    remediation: Identify the field and object from the error message and correct the mapping.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/field-integrity-exception/
+
+  - code: FIELD_CUSTOM_VALIDATION_EXCEPTION
+    title: Field Custom Validation Exception
+    layer: salesforce-platform
+    class: validation
+    cause: >-
+      The write conflicts with one or more customer-defined Salesforce validation
+      rules - unmet business logic, unpopulated required fields, unmet field
+      dependencies, or format mismatches.
+    remediation: >-
+      Locate the object and field named in the full error message, find the
+      offending validation rule, and adjust the rule or the data Revenue.io sends.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/field-custom-validation-exception/
+
+  - code: INVALID_OR_NULL_FOR_RESTRICTED_PICKLIST
+    title: Invalid Or Null For Restricted Picklist
+    layer: salesforce-platform
+    class: validation
+    surfaced_as: 'Error updating record: bad value for restricted picklist field: {{value}}'
+    cause: >-
+      Revenue.io sent a value not defined in the target restricted picklist -
+      case mismatch, stray whitespace or special characters, a new value never
+      added to Salesforce, or a value Salesforce has since deactivated.
+    remediation: >-
+      Identify the field from the logs and either add/reactivate the value in
+      Salesforce or correct the value Revenue.io sends.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/invalid-or-null-for-restricted-picklist/
+
+  - code: CANNOT_UPDATE_CONVERTED_LEAD
+    title: Cannot Update Converted Lead
+    layer: salesforce-platform
+    class: state-conflict
+    cause: >-
+      Revenue.io tried to update a Lead already converted to a Contact/Account/
+      Opportunity; converted Leads are read-only in Salesforce. Often a race - the
+      Lead is converted during an active call or before post-call updates finish.
+    remediation: >-
+      Review conversion workflows running concurrently with Revenue.io operations
+      and delay conversion until post-call logging completes.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/cannot-update-converted-lead/
+
+  - code: INVALID_TYPE
+    title: '[INVALID_TYPE] sObject type is not supported'
+    layer: salesforce-platform
+    class: authorization
+    surfaced_as: "[INVALID_TYPE] sObject type 'call_flow__c' is not supported. If you are attempting to use a custom object, be sure to append the '__c' after the entity name."
+    cause: >-
+      The user lacks create permission on an object Revenue.io must write -
+      commonly the Call Flow or Call Flow Step custom objects created alongside a
+      Conversation record on an inbound Call Flow call. Blocks the conversation
+      activity from being created.
+    remediation: Grant create permission on the object named between the single quotes in the error.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/invalid-type-sobject-type-is-not-supported/
+
+  - code: BAD_FIELD_NAMES_ACCOUNTID
+    title: 'Error updating record: Account: bad field names on insert/update call: AccountId'
+    layer: salesforce-platform
+    class: configuration
+    cause: >-
+      Occurs in orgs with Person Accounts enabled. Person Accounts merge Contact
+      and Account records, changing how the Account Name field is handled, which
+      conflicts with the Intelligent Dialer's write.
+    related_error: 'Error updating record: Unable to create/update fields: Name.'
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/error-updating-record-account-bad-field-names-on-insert-update-call-accountid/
+
+  - code: OAUTH_ACCESS_SCOPE
+    title: OAuth Access Scope
+    layer: salesforce-platform
+    class: authorization
+    cause: >-
+      Revenue.io's Salesforce Connected App grant was revoked or issued without
+      the api, web and refresh_token scopes it requires to log call data while the
+      user is offline.
+    remediation: Re-authorize the Connected App with the documented scopes.
+    docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/oauth-access-scope/
+    see_also: scopes/ringdna-scopes.yml
+
+  - code: SALESFORCE_OAUTH_FAILED_IP_RESTRICTED
+    title: Salesforce OAuth failed - IP restricted
+    layer: revenue-io
+    class: authorization
+    cause: Salesforce login IP restrictions block the Revenue.io dialer sign-in.
+    docs: https://support.revenue.io/ringdna/troubleshooting/signing-in/salesforce-oauth-failed-ip-restricted/
+
+deferral_reasons:
+  description: >-
+    The System Deferral Reason field (API name System_Deferral_Reason__c) on a
+    Participant Action explains why a scheduled action was not processed as
+    planned. Depending on the reason the action is retried later, skipped, or
+    converted to a manual action for review. This is the closest thing Guided
+    Selling has to an asynchronous error enumeration.
+  source: https://support.revenue.io/guided-selling/reference-architecture/object-architecture/participant-action/system-deferral-reasons/
+  values:
+    - code: WAIT_CRITERIA
+      meaning: Action criteria are not currently met; may be retried once the record changes.
+      disposition: retry
+    - code: SKIP_CRITERIA
+      meaning: Action criteria were not met and the action is configured to skip rather than wait.
+      disposition: skip
+    - code: PREVIOUSLY_ATTEMPTED_EMAIL
+      meaning: The email action was already attempted and should not be sent again.
+      disposition: skip
+    - code: BLANK_EMAIL_ADDRESS
+      meaning: No valid email address was available for the participant.
+      disposition: skip
+    - code: SF_EMAIL_TEMPLATE
+      meaning: >-
+        The action is tied to a Salesforce email template that does not continue
+        through the expected Guided Selling automated email path.
+      disposition: skip
+    - code: SFDC_EMAIL_ACTION
+      meaning: >-
+        The action uses the Salesforce email type and is excluded from the native
+        Guided Selling email processing path.
+      disposition: skip
+    - code: EMPTY_EMAIL_BODY
+      meaning: The automatic email resolved to blank content.
+      disposition: convert-to-manual
+    - code: BAD_SYNTAX_EMAIL_BODY
+      meaning: The email body contains unresolved or invalid merge syntax.
+      disposition: convert-to-manual
+
+participant_action_statuses:
+  description: >-
+    The Status formula field on a Participant Action. Not errors, but the state
+    machine an integrator must read to know whether work succeeded, was skipped,
+    or is blocked.
+  source: https://support.revenue.io/guided-selling/reference-architecture/object-architecture/participant-action/participant-action-status-glossary/
+  values:
+    - {status: Completed, meaning: The action was finished successfully.}
+    - {status: Initiated, meaning: The action has been started but not completed.}
+    - {status: Auto Skipped, meaning: The system skipped the action automatically - participant opted out or skip rules applied.}
+    - {status: Manually Skipped, meaning: A user or admin deferred the action outside automated logic.}
+    - {status: Not Actionable, meaning: Cannot be completed due to ownership or delegation - assigned user inactive or fallback owner.}
+    - {status: Upcoming, meaning: Scheduled for a future time.}
+    - {status: On Engage, meaning: Ready to be performed now; no blocking criteria.}
+    - {status: Sending Soon, meaning: Automated action ready to send or auto-complete shortly.}
+    - {status: Sending Soon - Pending Criteria, meaning: Automated, but waiting on conditions to be met.}
+    - {status: On Engage - Pending Criteria, meaning: Due, but waiting on criteria or rules before it becomes performable.}
+
+problem_count: 15

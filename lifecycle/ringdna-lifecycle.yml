@@ -1,0 +1,93 @@
+generated: '2026-08-14'
+method: searched
+source: https://support.revenue.io/releases/
+name: RingDNA / Revenue.io Lifecycle
+description: >-
+  Revenue.io ships on a visible cadence and says so publicly: a monthly platform
+  product-update post, plus a named seasonal release train for the Guided Selling
+  managed package. What it does not publish is any API lifecycle policy - no
+  versioning scheme for an HTTP interface, no deprecation policy, no Sunset
+  header support, and no SLA page. That is unsurprising given there is no public
+  HTTP API, but it is recorded rather than assumed.
+
+versioning:
+  scheme: named-release-train
+  applies_to: Guided Selling managed package (RDNACadence namespace)
+  current: V12 (Winter 2026)
+  docs: https://support.revenue.io/guided-selling/release-notes/
+  history:
+    - {version: V12, name: Guided Selling Winter 2026 Release, url: 'https://support.revenue.io/guided-selling/release-notes/guided-selling-winter-2025-release-v12/'}
+    - {version: V11, name: Guided Selling Summer 2025 Release, url: 'https://support.revenue.io/guided-selling/release-notes/guided-selling-summer-2025-release-v11/'}
+    - {version: V10, name: Guided Selling Summer 2024 Release, url: 'https://support.revenue.io/guided-selling/release-notes/guided-selling-summer-2024-release-v10/'}
+    - {version: V9, name: Guided Selling March 2024 Release, url: 'https://support.revenue.io/guided-selling/release-notes/guided-selling-march-2024-release-v9/'}
+  platform:
+    scheme: continuous
+    note: >-
+      The Revenue.io platform itself is not version-numbered. Changes land
+      continuously and are narrated monthly in the product updates feed.
+  api:
+    scheme: none
+    note: >-
+      No URI, header or date-based API version is published, because no public
+      HTTP API is published. The MCP server at https://app.ringdna.com/mcp is
+      unversioned in its path and its discovery documents carry no version field.
+
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  note: >-
+    No deprecation or end-of-life policy was found anywhere in the 753-page
+    Knowledge Center index, and no Sunset/Deprecation header support is
+    documented. Release notes describe additions; they do not announce removals
+    with a notice window. This is a genuine gap, not an unsearched one.
+
+sla:
+  url: null
+  uptime_target: null
+  note: >-
+    https://www.revenue.io/sla returns 404. Commercial terms live in the Master
+    Service Agreement at https://www.revenue.io/msa; no public uptime commitment
+    is stated on the website or the status page.
+
+status_page:
+  url: https://status.revenue.io
+  http_status: 200
+  title: Revenue.io Status
+  subscribe_docs: https://support.revenue.io/getting-started/revenueio-platform/subscribing-to-revenueio-status-updates/
+  machine_readable: false
+  note: >-
+    The status page is live and customer-subscribable, but exposes no
+    machine-readable feed - /api/v2/summary.json, /api/v2/status.json and
+    /history.rss all return 404, so it is not a Statuspage.io-compatible surface
+    an agent can poll.
+
+change_communication:
+  - {kind: product-updates, url: 'https://support.revenue.io/releases/', cadence: monthly}
+  - {kind: whats-new, url: 'https://support.revenue.io/whats-new/'}
+  - {kind: rss, url: 'https://support.revenue.io/releases/index.xml', http_status: 200, content_type: application/xml}
+  - {kind: package-changelog, url: 'https://support.revenue.io/getting-started/installing-the-revenueio-revenue-intelligence-package/revenue-intelligence-package-changelog/'}
+  - {kind: release-notes, url: 'https://support.revenue.io/guided-selling/release-notes/'}
+
+deprecated_operations: []
+
+decay_signals:
+  - signal: dead-api-host
+    detail: >-
+      api.ringdna.com, the baseURL published for the Guided Selling API, returns
+      NXDOMAIN - the DNS record has been removed entirely. Probed 2026-08-14.
+    severity: high
+  - signal: unpublished-sdk
+    detail: >-
+      The only first-party client library, github.com/ringdna/api-client
+      (@ringdna/client), sits at version 0.0.0, license UNLICENSED, last pushed
+      2023-07-18, and was never published to npm.
+    severity: medium
+  - signal: legacy-docs-platform
+    detail: >-
+      The Knowledge Center has migrated from a Salesforce Community
+      (support.revenue.io/s/topic/...) and a Zendesk instance (/hc/en-us/...) to a
+      Hugo static site. 572 of 1,466 sitemap URLs are still legacy /hc/ paths, so
+      duplicate content exists on two URL schemes.
+    severity: low

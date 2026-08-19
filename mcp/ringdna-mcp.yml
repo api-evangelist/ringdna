@@ -1,0 +1,99 @@
+generated: '2026-08-14'
+method: probed
+source: https://app.ringdna.com/.well-known/oauth-protected-resource
+status: published
+name: RingDNA / Revenue.io MCP Server
+description: >-
+  Revenue.io (formerly RingDNA) operates a live, remotely-hosted Model Context
+  Protocol server at https://app.ringdna.com/mcp. It is a real agent surface: an
+  MCP client can POST to it today without any local install. It is protected by
+  OAuth 2.1 with PKCE, and it advertises itself through the full modern discovery
+  chain - RFC 9728 protected-resource metadata, RFC 8414 authorization-server
+  metadata, and RFC 7591 dynamic client registration.
+
+  The server is UNDOCUMENTED. It appears nowhere in the Revenue.io Knowledge
+  Center (753 indexed documentation pages, zero matches for "MCP" or "Model
+  Context Protocol"), nowhere in the marketing site llms.txt, and nowhere in the
+  product release notes through July 2026. It was found only by probing the
+  well-known surface. That is a discovery gap the provider can close cheaply: the
+  server is already shipped and reachable, but no customer or agent can find it
+  from the docs.
+
+deployment:
+  mode: remote
+  endpoint: https://app.ringdna.com/mcp
+  auth: oauth
+  verified: probed
+  note: >-
+    No stdio package exists. No npm, PyPI, or other registry package is published
+    under ringdna/revenue.io (all registry lookups 404). This is a hosted endpoint
+    only - install/package are intentionally empty, not omitted.
+
+server:
+  name: ringdna
+  transport: http
+  url: https://app.ringdna.com/mcp
+  protected_resource_metadata: https://app.ringdna.com/.well-known/oauth-protected-resource
+  authorization_server_metadata: https://app.ringdna.com/.well-known/oauth-authorization-server
+
+authorization:
+  spec: OAuth 2.1 / MCP authorization
+  issuer: https://app.ringdna.com
+  authorization_endpoint: https://app.ringdna.com/mcp/oauth/authorize
+  token_endpoint: https://app.ringdna.com/mcp/oauth/token
+  registration_endpoint: https://app.ringdna.com/mcp/oauth/register
+  dynamic_client_registration: true
+  dcr_probe:
+    method: POST
+    url: https://app.ringdna.com/mcp/oauth/register
+    status: 201
+    note: Anonymous DCR is open - the endpoint issued a client on an empty body.
+  grant_types_supported:
+    - authorization_code
+    - refresh_token
+  response_types_supported:
+    - code
+  code_challenge_methods_supported:
+    - S256
+  token_endpoint_auth_methods_supported:
+    - none
+  bearer_methods_supported:
+    - header
+  scopes_supported:
+    - mcp
+
+tools: []
+tools_status: gated
+tools_note: >-
+  NO TOOLS ARE RECORDED, DELIBERATELY. An anonymous POST of
+  {"jsonrpc":"2.0","id":1,"method":"tools/list"} and of initialize both return
+  HTTP 401 with
+  WWW-Authenticate: Bearer resource_metadata="https://app.ringdna.com/.well-known/oauth-protected-resource/mcp".
+  The live tool set therefore requires an authenticated OAuth introspection
+  against a real Revenue.io tenant. There is no OpenAPI in this repo and no
+  published tool list in the docs or llms.txt to fall back on, so nothing can be
+  derived without fabricating it. The tool list is a known gap, not an absence.
+
+x-evidence:
+  - fetched: '2026-08-14'
+    url: https://app.ringdna.com/.well-known/oauth-protected-resource
+    http_status: 200
+    content_type: application/json
+  - fetched: '2026-08-14'
+    url: https://app.ringdna.com/.well-known/oauth-authorization-server
+    http_status: 200
+    content_type: application/json
+  - fetched: '2026-08-14'
+    url: https://api.revenue.io/.well-known/oauth-authorization-server
+    http_status: 200
+    content_type: application/json
+    note: Same document served from the api.revenue.io host; issuer is app.ringdna.com.
+  - fetched: '2026-08-14'
+    url: https://app.ringdna.com/mcp
+    http_method: POST
+    http_status: 401
+    note: tools/list rejected with an OAuth bearer challenge - server is live and gated.
+  - fetched: '2026-08-14'
+    url: https://app.ringdna.com/mcp/oauth/register
+    http_method: POST
+    http_status: 201

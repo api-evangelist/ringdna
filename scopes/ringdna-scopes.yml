@@ -1,0 +1,96 @@
+generated: '2026-08-14'
+method: probed
+source: https://app.ringdna.com/.well-known/oauth-authorization-server
+docs: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/oauth-access-scope/
+name: RingDNA / Revenue.io OAuth Scopes
+description: >-
+  Two OAuth surfaces carry scopes. The first is Revenue.io's own: the MCP
+  authorization server at app.ringdna.com declares exactly one scope, `mcp`, in
+  its RFC 8414 metadata. The second is not Revenue.io's to define - it is the set
+  of Salesforce Connected App scopes Revenue.io requests from the customer's
+  Salesforce org, published in the Knowledge Center. Both are recorded because an
+  agent or admin evaluating Revenue.io's access footprint needs both. No scope
+  was derived from an OpenAPI - this repo has none.
+
+schemes:
+  - name: mcp-oauth
+    source: https://app.ringdna.com/.well-known/oauth-authorization-server
+    owner: Revenue.io
+    flows:
+      - flow: authorizationCode
+        authorizationUrl: https://app.ringdna.com/mcp/oauth/authorize
+        tokenUrl: https://app.ringdna.com/mcp/oauth/token
+        pkce: S256
+
+  - name: salesforce-connected-app
+    source: https://support.revenue.io/integrations/salesforce/common-salesforce-errors/oauth-access-scope/
+    owner: Salesforce
+    flows:
+      - flow: authorizationCode
+        authorizationUrl: https://login.salesforce.com/services/oauth2/authorize
+
+scopes:
+  - scope: mcp
+    description: >-
+      The single scope advertised by the RingDNA MCP authorization server. It is
+      coarse - there is no read/write split and no per-tool or per-resource
+      scope - so an agent granted `mcp` receives whatever the server exposes to
+      that user. Declared in both the authorization-server metadata and the
+      protected-resource metadata for https://app.ringdna.com/mcp.
+    flows:
+      - authorizationCode
+    scheme: mcp-oauth
+    granularity: coarse
+    sources:
+      - https://app.ringdna.com/.well-known/oauth-authorization-server
+      - https://app.ringdna.com/.well-known/oauth-protected-resource
+
+  - scope: api
+    description: >-
+      Salesforce scope Revenue.io requests. Allows access to the logged-in user's
+      account using APIs such as REST API and Bulk API 2.0; also includes
+      chatter_api for Connect REST API resources.
+    flows:
+      - authorizationCode
+    scheme: salesforce-connected-app
+    owner: Salesforce
+    sources:
+      - https://support.revenue.io/integrations/salesforce/common-salesforce-errors/oauth-access-scope/
+
+  - scope: web
+    description: >-
+      Salesforce scope Revenue.io requests. Allows use of the access_token on the
+      web; includes visualforce, permitting access to customer-created
+      Visualforce pages.
+    flows:
+      - authorizationCode
+    scheme: salesforce-connected-app
+    owner: Salesforce
+    sources:
+      - https://support.revenue.io/integrations/salesforce/common-salesforce-errors/oauth-access-scope/
+
+  - scope: refresh_token
+    description: >-
+      Salesforce scope Revenue.io requests. Returns a refresh token so Revenue.io
+      can log call data back to Salesforce while the user is offline. Synonymous
+      with requesting offline_access. This is the scope that gives Revenue.io
+      persistent, unattended access to the customer's CRM.
+    flows:
+      - authorizationCode
+    scheme: salesforce-connected-app
+    owner: Salesforce
+    sources:
+      - https://support.revenue.io/integrations/salesforce/common-salesforce-errors/oauth-access-scope/
+
+revocation:
+  supported: true
+  note: >-
+    Users and admins can revoke the Revenue.io Connected App at any time from
+    Salesforce. No revocation endpoint is advertised for the MCP authorization
+    server (no revocation_endpoint in its RFC 8414 metadata).
+
+notes:
+  - >-
+    The Guided Selling API Key / API Secret credential has NO scope model at all -
+    it is an all-or-nothing credential bound to a Salesforce Org ID. See
+    authentication/ringdna-authentication.yml.

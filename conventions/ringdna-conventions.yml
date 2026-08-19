@@ -1,0 +1,175 @@
+generated: '2026-08-14'
+method: searched
+source: https://support.revenue.io/guided-selling/salesforce-administration/api-endpoints/
+name: RingDNA / Revenue.io API Conventions
+description: >-
+  The single most important convention to record about Revenue.io is that its
+  "API endpoints" are not HTTP endpoints. The Guided Selling API Endpoints
+  section of the Knowledge Center documents three Salesforce Apex classes in the
+  RDNACadence managed package, each also exposed as a Flow invocable action. They
+  are called from inside the customer's own Salesforce org - there is no URL, no
+  method, no header, and no status code. Anything expecting REST semantics
+  (pagination, idempotency keys, content negotiation, rate-limit headers) will
+  find none of it, because the transport is Apex, not HTTP. The one genuine HTTP
+  surface Revenue.io operates is the MCP server, which follows MCP/JSON-RPC
+  conventions rather than REST.
+
+surface_model:
+  primary: salesforce-apex
+  namespace: RDNACadence
+  invocation_modes:
+    - mode: flow-invocable
+      description: >-
+        Add an element of type Action in the Salesforce Flow editor and search for
+        the action by name.
+    - mode: apex
+      description: >-
+        Instantiate a Request object, pass a List of requests to the static
+        service method, read back a List of Result objects.
+  bulk_native: true
+  bulk_note: >-
+    Every documented entry point is bulk-first: it takes a List of Request objects
+    and returns a List of Result objects, and the single-record parameter is the
+    convenience form. This mirrors Salesforce invocable-action semantics.
+  secondary: mcp
+  secondary_note: >-
+    https://app.ringdna.com/mcp - JSON-RPC 2.0 over HTTP with OAuth bearer auth.
+    See mcp/ringdna-mcp.yml.
+
+documented_operations:
+  - name: Complete Participant Action
+    apex_class: RDNACadence.CompleteParticipantAction
+    method: completeParticipantActions
+    request_type: RDNACadence.CompleteParticipantAction.CompleteActionRequest
+    result_type: RDNACadence.CompleteParticipantAction.CompleteActionResult
+    parameters:
+      - {name: participantActionId, type: Id, description: Salesforce Id of the Participant Action}
+      - {name: participantActionIds, type: List<Id>, description: List of Participant Action IDs}
+    parameter_rule: Either participantActionId or participantActionIds is required.
+    docs: https://support.revenue.io/guided-selling/salesforce-administration/api-endpoints/complete-participant-action/
+
+  - name: Skip Participant Action
+    apex_class: RDNACadence.SkipParticipantAction
+    method: skipParticipantActions
+    request_type: RDNACadence.SkipParticipantAction.SkipActionRequest
+    result_type: RDNACadence.SkipParticipantAction.SkipActionResult
+    parameters:
+      - {name: participantActionId, type: Id, description: Salesforce Id of the Participant Action}
+      - {name: participantActionIds, type: List<Id>, description: List of Participant Action IDs}
+    parameter_rule: Either participantActionId or participantActionIds is required.
+    docs: https://support.revenue.io/guided-selling/salesforce-administration/api-endpoints/skip-participant-action/
+
+  - name: Create Quick Action
+    apex_class: RDNACadence.QuickActionCreator
+    method: createQuickActions
+    request_type: RDNACadence.QuickActionCreator.QuickActionRequest
+    result_type: RDNACadence.QuickActionCreator.QuickActionResult
+    parameters:
+      - {name: actionName, type: String, description: Name of the action}
+      - {name: actionType, type: String, description: 'Call, SMS or Task'}
+      - {name: expectedExecutionDate, type: Datetime, description: Any datetime; defaults to current datetime}
+      - {name: participantId, type: Id, description: Lead or Contact Id}
+      - {name: participantIds, type: List<Id>, description: List of Lead or Contact Ids}
+      - {name: configuration, type: String, description: 'Optional JSON string, e.g. {"task": {"Subject": "Test Subject 3"}}'}
+      - {name: ownerId, type: Id, description: Optional; defaults to current owner}
+    docs: https://support.revenue.io/guided-selling/salesforce-administration/api-endpoints/create-quick-action/
+    note: Quick Actions are actions that do not belong to a specific sequence.
+
+authentication:
+  style: >-
+    No per-request credential. The Apex entry points run inside the customer's
+    Salesforce org under the calling user's context, so authorization is Salesforce
+    profiles and permission sets. Platform-level communication with Revenue.io
+    servers uses a preconfigured API Key + API Secret bound to the Salesforce Org
+    ID. The MCP server uses an OAuth 2.1 bearer token.
+  see: authentication/ringdna-authentication.yml
+
+idempotency:
+  supported: false
+  key_header: null
+  note: >-
+    NO IDEMPOTENCY CONTRACT EXISTS. There is no Idempotency-Key header, no request
+    key parameter, and no documented replay window - which follows from the
+    surface being Apex rather than HTTP. Complete and Skip are naturally
+    convergent (completing an already-completed action is a no-op at the record
+    level), but Create Quick Action is NOT: calling it twice creates two
+    Participant Action records. Callers must dedupe themselves. Recorded honestly
+    as absent; no Idempotency pointer is emitted for this provider.
+  retry:
+    automatic: true
+    scope: internal Salesforce write sync only
+    attempts: 3
+    trigger: UNABLE_TO_LOCK_ROW
+    note: >-
+      Revenue.io retries its own Salesforce write up to three times on a row-lock
+      conflict. This is internal behaviour, not a caller-facing retry contract.
+
+pagination:
+  supported: false
+  note: >-
+    Not applicable. Reads happen through Salesforce SOQL/Bulk API against the
+    objects in data-model/ringdna-data-model.yml, so Salesforce query pagination
+    (queryMore / nextRecordsUrl) governs, not a Revenue.io convention.
+
+filtering:
+  model: salesforce-criteria
+  note: >-
+    Sequence entrance/exit criteria use a Revenue.io operator vocabulary that
+    varies by Salesforce field type.
+  see: data-model/ringdna-data-model.yml#criteria_model
+
+error_envelope:
+  style: apex-result-object
+  fields: [success, errorMessage, participantActionId, successfulIds, errors]
+  configurable_mode:
+    setting: GS_PublicSettings__c.logging_throwExceptions__c
+    label: Throw exceptions
+    description: >-
+      When true an Apex exception is thrown; when false the error is returned on
+      the result object. Callers must know which mode the org runs in - the same
+      code path either throws or returns depending on a custom setting.
+  http_problem_details: false
+  see: errors/ringdna-error-codes.yml
+
+versioning:
+  request: none
+  note: >-
+    No API version is negotiated. The effective version is whichever release of
+    the managed package (currently V12) is installed in the org.
+  see: lifecycle/ringdna-lifecycle.yml
+
+rate_limit_signaling:
+  headers: []
+  note: >-
+    No X-RateLimit-* or RateLimit-* headers, because there is no HTTP response to
+    carry them. Throttling manifests as the Salesforce REQUEST_LIMIT_EXCEEDED
+    error and as fixed application guardrails.
+  see: rate-limits/ringdna-rate-limits.yml
+
+request_tracing:
+  request_id_header: null
+  note: >-
+    No request-id convention. Troubleshooting is done through the Revenue.io
+    Account Settings Logs (filterable to Salesforce errors) and Salesforce audit
+    logs.
+
+metadata:
+  supported: partial
+  note: >-
+    Create Quick Action accepts a free-form JSON `configuration` string that is
+    merged onto the created Salesforce record (e.g. task Subject, Description,
+    Priority, Status). This is the only extensibility hook in the documented
+    surface.
+
+field_expansion:
+  supported: false
+
+content_types:
+  note: >-
+    Not applicable to the Apex surface. The MCP server uses application/json and
+    advertises text/event-stream in the MCP transport.
+
+known_gaps:
+  - The apis.yml baseURL https://api.ringdna.com is NXDOMAIN as of 2026-08-14.
+  - No OpenAPI, no Postman collection, no SDK, and no code samples outside Apex.
+  - The live MCP server is documented nowhere in the Knowledge Center.

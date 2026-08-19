@@ -1,0 +1,135 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  registry.npmjs.org, pypi.org, api.github.com/orgs/ringdna, and the Revenue.io
+  Knowledge Center SDK/install pages
+name: RingDNA / Revenue.io Packages
+description: >-
+  Revenue.io publishes NO client SDK to any public package registry. Every
+  registry lookup returned 404. What Revenue.io distributes instead is Salesforce
+  managed packages (installed from AppExchange / an install URL inside a
+  Salesforce org, with no public registry metadata) and a Chrome extension. Those
+  are recorded below as non-registry distributions so the absence is legible, but
+  none of them is a developer client library, and none earns an SDK pointer.
+
+package_count: 0
+official_sdk_count: 0
+
+packages: []
+
+registries_checked:
+  - registry: npm
+    queries:
+      - '@ringdna/api-client'
+      - '@ringdna/client'
+      - '@ringdna/mcp'
+      - ringdna
+      - ringdna-mcp
+      - revenue-io
+      - '@revenue.io/sdk'
+    result: 404 on every name; registry search for "ringdna" and "revenue.io" returned zero packages.
+  - registry: pypi
+    queries:
+      - ringdna
+      - revenueio
+    result: 404 on both.
+  - registry: rubygems
+    result: not published
+  - registry: maven-central
+    result: not published
+  - registry: nuget
+    result: not published
+  - registry: crates.io
+    result: not published
+  - registry: pkg.go.dev
+    result: not published
+  - registry: packagist
+    result: not published
+
+non_registry_distributions:
+  - name: Revenue.io Revenue Intelligence Package
+    kind: salesforce-managed-package
+    registry: salesforce-appexchange
+    official: true
+    version: null
+    published: null
+    url: https://support.revenue.io/getting-started/installing-the-revenueio-revenue-intelligence-package/
+    changelog: https://support.revenue.io/getting-started/installing-the-revenueio-revenue-intelligence-package/revenue-intelligence-package-changelog/
+    note: >-
+      Distributed as a Salesforce managed package, not through a public registry,
+      so there is no metadata endpoint to read a version or release date from.
+      version/published are null because they were checked and are unobtainable
+      anonymously - a customer sees the version only inside their own Salesforce
+      org. The package does maintain a public changelog page.
+
+  - name: Guided Selling by Revenue.io
+    kind: salesforce-managed-package
+    registry: salesforce-appexchange
+    namespace: RDNACadence
+    official: true
+    version: V12
+    published: null
+    url: https://support.revenue.io/guided-selling/release-notes/guided-selling-winter-2025-release-v12/
+    note: >-
+      Versioned by named seasonal release (V9 March 2024, V10 Summer 2024,
+      V11 Summer 2025, V12 Winter 2026) rather than semver. `published` is null
+      because the release-notes pages carry a release name but no machine-readable
+      package publish date. The Apex namespace RDNACadence is the developer-facing
+      surface (see openapi absence in conventions/).
+
+  - name: Revenue.io Advanced Solutions Package
+    kind: salesforce-managed-package
+    registry: salesforce-appexchange
+    official: true
+    version: null
+    published: null
+    url: https://support.revenue.io/getting-started/installing-the-revenueio-advanced-solutions-package/
+
+  - name: Revenue.io Hot Leads Package
+    kind: salesforce-managed-package
+    registry: salesforce-appexchange
+    official: true
+    version: null
+    published: null
+    url: https://support.revenue.io/getting-started/installing-the-revenueio-hot-leads-package/
+
+  - name: RingDNA by Revenue.io (Chrome extension)
+    kind: browser-extension
+    registry: chrome-web-store
+    official: true
+    version: null
+    published: null
+    url: https://chromewebstore.google.com/detail/ringdna-by-revenueio/coeeccnnaonnljjhoonkmmoihpibgane
+    note: >-
+      The Chrome Web Store exposes no anonymous metadata endpoint, so version and
+      publish date are null - checked, not obtainable. This is the end-user
+      dialer client, not a developer SDK.
+
+abandonment_signals:
+  - repo: https://github.com/ringdna/api-client
+    package_name: '@ringdna/client'
+    language: typescript
+    version: 0.0.0
+    published: null
+    last_pushed: '2023-07-18'
+    license: UNLICENSED
+    registry: none
+    official: true
+    consumable: false
+    note: >-
+      The only first-party client library that exists anywhere is this GitHub
+      repo. Its package.json declares version 0.0.0 and license UNLICENSED, it was
+      last pushed 2023-07-18, and the name @ringdna/client returns 404 on npm - it
+      was never published. `published` is null because there is no release to
+      date. Recorded here rather than under packages[] because it is not
+      installable by any consumer; listing it as a package would credit Revenue.io
+      with an SDK it does not ship.
+
+github_org:
+  url: https://github.com/ringdna
+  public_repos: 8
+  note: >-
+    Seven of the eight public repos are forks of third-party projects (n8n,
+    metabase, jitsi, aws-codedeploy-agent, airflow-prometheus-exporter,
+    json-logic-java) or one-off demos. Only api-client is first-party code, and it
+    is unpublished. There is no SDK org, no monorepo, and no release tags.
