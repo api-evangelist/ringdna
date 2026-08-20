@@ -76,6 +76,9 @@ apis:
     baseURL: https://app.ringdna.com/mcp
     tags:
       - MCP
+      - AI Agents
+    tags_raw:
+      - MCP
       - Model Context Protocol
       - AI Agents
     properties:
