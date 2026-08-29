@@ -1,6 +1,17 @@
 aid: ringdna
 name: RingDNA
 description: RingDNA (now Revenue.io) is an intelligent revenue platform providing REST APIs for sales dialing, call recording, conversation analytics, real-time coaching, and CRM integration. The platform is 100% Salesforce-native and serves revenue teams with AI-driven sales engagement, guided selling cadences, conversation intelligence, and revenue orchestration capabilities including the RingDNA Dialer, Moments real-time guidance, and Guided Selling API endpoints.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: approval
