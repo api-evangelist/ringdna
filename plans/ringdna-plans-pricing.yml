@@ -72,3 +72,28 @@ plans:
       - Full Conversation Intelligence suite
       - Salesforce-certified implementation
       - Dedicated success manager
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - negotiated
+  units: []
+  plans:
+  - name: Activate
+    access: other
+    model: negotiated
+    model_how: derived
+    units: []
+    periods: []
+  - name: Engage
+    access: other
+    model: negotiated
+    model_how: derived
+    units: []
+    periods: []
+  - name: Orchestrate
+    access: other
+    model: negotiated
+    model_how: derived
+    units: []
+    periods: []
